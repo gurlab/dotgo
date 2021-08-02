@@ -1,0 +1,10 @@
+mkdir godot
+cd godot
+
+touch main.go // kodlar buraya gelecek
+
+go mod init godot
+
+go get github.com/g3n/engine@master
+
+go mod tidy
