@@ -1,4 +1,4 @@
-module godot
+module dotgo
 
 go 1.16
 

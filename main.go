@@ -1,9 +1,7 @@
 package main
 
-import "godot/app"
+import "dotgo/app"
 
 func main() {
-
-	// Create and run application
 	app.Create().Run()
 }

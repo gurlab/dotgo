@@ -16,20 +16,20 @@ import (
 
 type App struct {
 	*app.Application
-	currentDemo IGame
-	dirData     string
-	scene       *core.Node
-	demoScene   *core.Node
-	ambLight    *light.Ambient
 
-	camera *camera.Camera       // Camera
-	orbit  *camera.OrbitControl // Orbit control
+	game      IGame
+	scene     *core.Node
+	demoScene *core.Node
+	ambLight  *light.Ambient
+
+	camera *camera.Camera
+	orbit  *camera.OrbitControl
 }
 
 type IGame interface {
-	Start(*App)                 // Called once at the start of the demo
-	Update(*App, time.Duration) // Called every frame
-	Cleanup(*App)               // Called once at the end of the demo
+	Start(*App)
+	Update(*App, time.Duration)
+	Cleanup(*App)
 }
 
 var GameMap = map[string]IGame{}
@@ -42,22 +42,19 @@ const (
 )
 
 func Create() *App {
-
 	a := new(App)
 	a.Application = app.App()
 
-	// Create scenes
-	a.demoScene = core.NewNode() // demoScene will be cleared before a new demo is started
+	a.demoScene = core.NewNode()
 	a.scene = core.NewNode()
 	a.scene.Add(a.demoScene)
 
 	width, height := a.GetSize()
 	aspect := float32(width) / float32(height)
 	a.camera = camera.New(aspect)
-	a.scene.Add(a.camera) // Add camera to scene (important for audio demos)
+	a.scene.Add(a.camera)
 	a.orbit = camera.NewOrbitControl(a.camera)
 
-	// Create and add ambient light to scene
 	a.ambLight = light.NewAmbient(&math32.Color{1.0, 1.0, 1.0}, 0.5)
 	a.scene.Add(a.ambLight)
 
@@ -78,8 +75,8 @@ func Create() *App {
 
 func (a *App) setupScene() {
 
-	if a.currentDemo != nil {
-		a.currentDemo.Cleanup(a)
+	if a.game != nil {
+		a.game.Cleanup(a)
 	}
 
 	a.UnsubscribeAllID(a)
@@ -140,8 +137,8 @@ func (a *App) Update(rend *renderer.Renderer, deltaTime time.Duration) {
 
 	a.Gls().Clear(gls.COLOR_BUFFER_BIT | gls.DEPTH_BUFFER_BIT | gls.STENCIL_BUFFER_BIT)
 
-	if a.currentDemo != nil {
-		a.currentDemo.Update(a, deltaTime)
+	if a.game != nil {
+		a.game.Update(a, deltaTime)
 	}
 
 	err := rend.Render(a.scene, a.camera)
